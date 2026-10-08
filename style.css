@@ -1,0 +1,204 @@
+/* Couleurs reprises des tokens de packages/ui (direction artistique
+   "nuit et hublot"), pour que la page web et l'application se ressemblent. */
+:root {
+  --background: #eff4f3;
+  --surface: #fafcfb;
+  --surface-raised: #ffffff;
+  --border: #d4e0de;
+  --text-primary: #0d1a1c;
+  --text-secondary: #3c5053;
+  --text-muted: #5c7073;
+  --accent: #0a5c55;
+  --on-accent: #ffffff;
+  --warning-muted: #f6ecd6;
+  --on-warning-muted: #5c4408;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a1315;
+    --surface: #111e21;
+    --surface-raised: #18292d;
+    --border: #22363a;
+    --text-primary: #e7efef;
+    --text-secondary: #aec2c4;
+    --text-muted: #90a5a8;
+    --accent: #46cdba;
+    --on-accent: #06211e;
+    --warning-muted: #342a14;
+    --on-warning-muted: #e3a845;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.hero {
+  padding: 2rem 0 1rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 2.5rem;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1875rem;
+  letter-spacing: -0.01em;
+}
+
+.lead {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1.0625rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1.25rem 0;
+}
+
+.card.download {
+  text-align: center;
+}
+
+.card.warning {
+  background: var(--surface-raised);
+}
+
+.button {
+  display: inline-block;
+  min-height: 48px;
+  line-height: 48px;
+  padding: 0 1.75rem;
+  margin: 0.5rem 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: 10px;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.button:hover,
+.button:focus-visible {
+  opacity: 0.9;
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+}
+
+.steps li {
+  margin-bottom: 0.75rem;
+}
+
+ul {
+  color: var(--text-secondary);
+  padding-left: 1.25rem;
+}
+
+li {
+  margin-bottom: 0.375rem;
+}
+
+code {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+  font-size: 0.9em;
+  word-break: break-all;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+}
+
+.note {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--accent);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9375rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.625rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+th {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+}

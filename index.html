@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Soute — aperçu de l'application</title>
+    <meta
+      name="description"
+      content="Soute, marketplace de kilos de bagages en soute. Aperçu interne de l'application Android."
+    />
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <p class="eyebrow">Aperçu interne</p>
+        <h1>Soute</h1>
+        <p class="lead">
+          Un voyageur a de la place dans sa valise. Un expéditeur réserve des kilos pour faire
+          transporter un objet. L'application sert de tiers de confiance.
+        </p>
+      </header>
+
+      <section class="card download">
+        <h2>Installer sur Android</h2>
+        <p class="muted">Version 0.1.0 · environ 60 Mo · Android 7 et plus</p>
+        <a class="button" id="apk" href="#">Télécharger l'application</a>
+        <p class="note">
+          Le téléchargement démarre immédiatement. Le fichier s'appelle
+          <code>application-&hellip;.apk</code>.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Si Android bloque l'installation</h2>
+        <p>C'est normal : l'application ne vient pas du Play Store. Trois écrans à passer.</p>
+        <ol class="steps">
+          <li>
+            Après le téléchargement, appuie sur <strong>Ouvrir</strong> dans la notification.
+          </li>
+          <li>
+            Android affiche <em>« votre téléphone n'est pas autorisé à installer des applications
+            inconnues provenant de cette source »</em>. Appuie sur <strong>Paramètres</strong>,
+            active <strong>Autoriser depuis cette source</strong>, puis reviens en arrière.
+          </li>
+          <li>
+            Si Play Protect affiche <em>« application non vérifiée »</em>, choisis
+            <strong>Installer quand même</strong>.
+          </li>
+        </ol>
+      </section>
+
+      <section class="card warning">
+        <h2>Ce que fait cette version, et ce qu'elle ne fait pas</h2>
+        <p><strong>Ce qui fonctionne</strong></p>
+        <ul>
+          <li>Parcourir les annonces et filtrer par destination</li>
+          <li>Ouvrir une annonce, faire varier les kilos et voir le détail des frais se recalculer</li>
+          <li>Le thème clair et sombre, qui suit le réglage du téléphone</li>
+        </ul>
+        <p><strong>Ce qui ne fonctionne pas encore</strong></p>
+        <ul>
+          <li>Aucun bouton d'action n'est branché : pas de connexion, pas de réservation, pas de paiement</li>
+          <li>Les annonces affichées sont des exemples, pas de vrais vols</li>
+          <li>L'application n'a ni serveur, ni compte, ni accès réseau</li>
+        </ul>
+        <p class="muted">
+          C'est un aperçu pour juger de l'allure et des parcours, pas une application utilisable.
+        </p>
+      </section>
+
+      <footer>
+        <nav>
+          <a href="confidentialite.html">Confidentialité</a>
+          <a href="suppression-de-compte.html">Suppression de compte</a>
+        </nav>
+        <p class="muted">Soute — application en cours de développement</p>
+      </footer>
+    </main>
+
+    <script>
+      // L'URL de l'artefact est posée ici pour pouvoir la remplacer a chaque
+      // nouveau build sans toucher au reste de la page.
+      var APK_URL =
+        'https://expo.dev/artifacts/eas/O1JQb-4toYKbNP9weV_N24TmPYNsXDLfHGb6RrQ5y2I.apk'
+      document.getElementById('apk').setAttribute('href', APK_URL)
+    </script>
+  </body>
+</html>
