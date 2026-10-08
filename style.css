@@ -1,33 +1,18 @@
 /* Couleurs reprises des tokens de packages/ui (direction artistique
-   "nuit et hublot"), pour que la page web et l'application se ressemblent. */
+   "nuit et hublot"). Sombre en permanence, comme la page d'accueil : une
+   bascule de thème entre deux pages du meme site fait bricolé. */
 :root {
-  --background: #eff4f3;
-  --surface: #fafcfb;
-  --surface-raised: #ffffff;
-  --border: #d4e0de;
-  --text-primary: #0d1a1c;
-  --text-secondary: #3c5053;
-  --text-muted: #5c7073;
-  --accent: #0a5c55;
-  --on-accent: #ffffff;
-  --warning-muted: #f6ecd6;
-  --on-warning-muted: #5c4408;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a1315;
-    --surface: #111e21;
-    --surface-raised: #18292d;
-    --border: #22363a;
-    --text-primary: #e7efef;
-    --text-secondary: #aec2c4;
-    --text-muted: #90a5a8;
-    --accent: #46cdba;
-    --on-accent: #06211e;
-    --warning-muted: #342a14;
-    --on-warning-muted: #e3a845;
-  }
+  --background: #06100f;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-raised: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.1);
+  --text-primary: #eaf4f2;
+  --text-secondary: #a9c0bd;
+  --text-muted: #74908d;
+  --accent: #46cdba;
+  --on-accent: #04201c;
+  --warning-muted: rgba(227, 168, 69, 0.17);
+  --on-warning-muted: #e3a845;
 }
 
 * {

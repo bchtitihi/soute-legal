@@ -3,89 +3,723 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Soute — aperçu de l'application</title>
+    <title>Soute — des kilos qui voyagent déjà</title>
     <meta
       name="description"
-      content="Soute, marketplace de kilos de bagages en soute. Aperçu interne de l'application Android."
+      content="Soute : réserve les kilos libres d'une valise, ou vends les tiens sur ton prochain vol. Aperçu interne de l'application Android."
     />
     <meta name="robots" content="noindex" />
-    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#06100F" />
+    <style>
+      /* ------------------------------------------------------------------
+         Palette issue des tokens de packages/ui, direction "nuit et hublot".
+         Page sombre par défaut : c'est le registre du produit, et c'est là
+         que l'accent sarcelle fonctionne le mieux.
+         ------------------------------------------------------------------ */
+      :root {
+        --bg: #06100f;
+        --bg-2: #0a1a1b;
+        --surface: rgba(255, 255, 255, 0.04);
+        --surface-strong: rgba(255, 255, 255, 0.07);
+        --hairline: rgba(255, 255, 255, 0.1);
+        --hairline-strong: rgba(255, 255, 255, 0.18);
+        --text: #eaf4f2;
+        --text-2: #a9c0bd;
+        --text-3: #74908d;
+        --accent: #46cdba;
+        --accent-deep: #0f8d7d;
+        --on-accent: #04201c;
+        --warn: #e3a845;
+        --radius: 18px;
+        --radius-sm: 11px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      /* Halo de fond. Deux taches qui dérivent lentement : ça donne de la
+         profondeur sans image et sans coût de chargement. */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: -30vh -30vw;
+        z-index: -1;
+        background:
+          radial-gradient(42vw 42vw at 18% 8%, rgba(70, 205, 186, 0.16), transparent 62%),
+          radial-gradient(38vw 38vw at 86% 32%, rgba(27, 91, 134, 0.18), transparent 60%),
+          radial-gradient(50vw 50vw at 50% 100%, rgba(15, 141, 125, 0.1), transparent 65%);
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+
+      @keyframes drift {
+        from {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        to {
+          transform: translate3d(-3%, 2%, 0) scale(1.08);
+        }
+      }
+
+      /* Grille fine, très discrète, pour l'effet technique. */
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background-image:
+          linear-gradient(var(--hairline) 1px, transparent 1px),
+          linear-gradient(90deg, var(--hairline) 1px, transparent 1px);
+        background-size: 64px 64px;
+        mask-image: radial-gradient(70% 55% at 50% 22%, #000 0%, transparent 78%);
+        opacity: 0.35;
+      }
+
+      main {
+        max-width: 72rem;
+        margin: 0 auto;
+        padding: 3.5rem 1.5rem 5rem;
+      }
+
+      /* ---------- En-tête ---------- */
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        align-items: center;
+        padding: 2rem 0 4rem;
+      }
+
+      @media (min-width: 62rem) {
+        .hero {
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 4rem;
+          padding: 3rem 0 6rem;
+        }
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.3rem 0.7rem 0.3rem 0.45rem;
+        border: 1px solid var(--hairline-strong);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--text-2);
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 3px rgba(70, 205, 186, 0.18);
+        animation: pulse 2.4s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.35;
+        }
+      }
+
+      h1 {
+        margin: 1.25rem 0 0;
+        font-size: clamp(3rem, 9vw, 5.25rem);
+        line-height: 0.98;
+        letter-spacing: -0.045em;
+        font-weight: 680;
+        background: linear-gradient(170deg, #ffffff 18%, #9fd8cf 58%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .lead {
+        margin: 1.25rem 0 0;
+        max-width: 34rem;
+        color: var(--text-2);
+        font-size: clamp(1.0625rem, 2.2vw, 1.25rem);
+      }
+
+      .lead strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2.25rem;
+      }
+
+      .button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        min-height: 54px;
+        padding: 0 1.6rem;
+        border-radius: var(--radius-sm);
+        background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+        color: var(--on-accent);
+        font-size: 1.03rem;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.3) inset,
+          0 14px 34px -12px rgba(70, 205, 186, 0.6);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.35) inset,
+          0 20px 44px -12px rgba(70, 205, 186, 0.72);
+      }
+
+      .button:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .button svg {
+        width: 19px;
+        height: 19px;
+      }
+
+      .meta {
+        color: var(--text-3);
+        font-size: 0.9rem;
+      }
+
+      /* ---------- Téléphone ---------- */
+      .phone-wrap {
+        display: flex;
+        justify-content: center;
+        perspective: 1400px;
+      }
+
+      .phone {
+        position: relative;
+        width: 290px;
+        border-radius: 38px;
+        padding: 10px;
+        background: linear-gradient(160deg, #27383a, #0c1718);
+        box-shadow:
+          0 0 0 1px var(--hairline-strong),
+          0 50px 90px -30px rgba(0, 0, 0, 0.9),
+          0 0 80px -30px rgba(70, 205, 186, 0.45);
+        transform: rotateY(-13deg) rotateX(4deg) rotateZ(1deg);
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .phone:hover {
+        transform: rotateY(-6deg) rotateX(2deg);
+      }
+
+      .screen {
+        border-radius: 29px;
+        background: #0a1315;
+        padding: 1.4rem 0.95rem 1rem;
+        overflow: hidden;
+      }
+
+      .notch {
+        width: 86px;
+        height: 5px;
+        margin: 0 auto 1.1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .screen h3 {
+        margin: 0 0 0.9rem;
+        font-size: 0.95rem;
+        letter-spacing: -0.01em;
+      }
+
+      .chips {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 0.9rem;
+      }
+
+      .chip {
+        padding: 0.2rem 0.55rem;
+        border: 1px solid var(--hairline);
+        border-radius: 7px;
+        font-size: 0.68rem;
+        color: var(--text-3);
+      }
+
+      .chip.on {
+        border-color: rgba(70, 205, 186, 0.5);
+        background: rgba(70, 205, 186, 0.14);
+        color: var(--accent);
+      }
+
+      .listing {
+        border: 1px solid var(--hairline);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.035);
+        padding: 0.8rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .listing.lead-card {
+        border-color: rgba(227, 168, 69, 0.34);
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .route {
+        font-size: 1rem;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+      }
+
+      .badge {
+        padding: 0.12rem 0.42rem;
+        border-radius: 6px;
+        background: rgba(227, 168, 69, 0.17);
+        color: var(--warn);
+        font-size: 0.6rem;
+      }
+
+      .sub {
+        margin: 0.25rem 0 0.7rem;
+        color: var(--text-3);
+        font-size: 0.72rem;
+      }
+
+      .who {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+
+      .av {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(70, 205, 186, 0.17);
+        color: var(--accent);
+        font-size: 0.62rem;
+        font-weight: 600;
+      }
+
+      .who span {
+        font-size: 0.71rem;
+        color: var(--text-2);
+      }
+
+      .verified {
+        display: block;
+        color: #5fc97e;
+        font-size: 0.62rem;
+      }
+
+      .price {
+        text-align: right;
+      }
+
+      .price b {
+        font-size: 0.98rem;
+        letter-spacing: -0.01em;
+      }
+
+      .price em {
+        display: block;
+        font-style: normal;
+        color: var(--text-3);
+        font-size: 0.62rem;
+      }
+
+      /* ---------- Sections ---------- */
+      section {
+        margin: 4.5rem 0 0;
+      }
+
+      h2 {
+        margin: 0 0 1.5rem;
+        font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+        letter-spacing: -0.03em;
+        font-weight: 650;
+      }
+
+      .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: 1fr;
+      }
+
+      @media (min-width: 48rem) {
+        .grid-3 {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .grid-2 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .card {
+        position: relative;
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius);
+        background: var(--surface);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        padding: 1.6rem;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--hairline-strong), transparent);
+      }
+
+      .num {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 0.9rem;
+        border: 1px solid rgba(70, 205, 186, 0.35);
+        border-radius: 10px;
+        background: rgba(70, 205, 186, 0.1);
+        color: var(--accent);
+        font-size: 0.85rem;
+        font-weight: 650;
+      }
+
+      .card h3 {
+        margin: 0 0 0.45rem;
+        font-size: 1.03rem;
+        letter-spacing: -0.015em;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--text-2);
+        font-size: 0.945rem;
+      }
+
+      .card.ok {
+        border-color: rgba(95, 201, 126, 0.26);
+      }
+
+      .card.todo {
+        border-color: rgba(227, 168, 69, 0.24);
+      }
+
+      .list {
+        margin: 0.9rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .list li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-2);
+        font-size: 0.945rem;
+      }
+
+      .list li::before {
+        position: absolute;
+        left: 0;
+        top: -0.02em;
+        font-weight: 700;
+      }
+
+      .list.yes li::before {
+        content: '✓';
+        color: #5fc97e;
+      }
+
+      .list.no li::before {
+        content: '—';
+        color: var(--warn);
+      }
+
+      .fine {
+        margin-top: 1rem;
+        color: var(--text-3);
+        font-size: 0.86rem;
+      }
+
+      code {
+        padding: 0.1em 0.42em;
+        border: 1px solid var(--hairline);
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.35);
+        font-size: 0.88em;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      .quiet {
+        display: inline-flex;
+        align-items: center;
+        min-height: 48px;
+        color: var(--text-2);
+        text-decoration: none;
+        border-bottom: 1px solid var(--hairline-strong);
+      }
+
+      .quiet:hover {
+        color: var(--text);
+      }
+
+      footer {
+        margin-top: 5rem;
+        padding-top: 1.75rem;
+        border-top: 1px solid var(--hairline);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 2rem;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      footer nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.75rem;
+      }
+
+      footer a {
+        color: var(--text-2);
+        text-decoration: none;
+        font-size: 0.93rem;
+      }
+
+      footer a:hover {
+        color: var(--accent);
+      }
+
+      footer p {
+        margin: 0;
+        color: var(--text-3);
+        font-size: 0.86rem;
+      }
+
+      /* Apparition au défilement, purement décorative. */
+      .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .reveal.seen {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* Le réglage système prime sur toute l'animation. */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        body::before,
+        .dot {
+          animation: none !important;
+          transition: none !important;
+        }
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+        .phone {
+          transform: none;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
   </head>
+
   <body>
     <main>
       <header class="hero">
-        <p class="eyebrow">Aperçu interne</p>
-        <h1>Soute</h1>
-        <p class="lead">
-          Un voyageur a de la place dans sa valise. Un expéditeur réserve des kilos pour faire
-          transporter un objet. L'application sert de tiers de confiance.
-        </p>
+        <div>
+          <span class="tag"><span class="dot"></span> Aperçu interne · v0.1.0</span>
+          <h1>Des kilos qui voyagent déjà</h1>
+          <p class="lead">
+            Un voyageur a de la place dans sa valise. Un expéditeur réserve des kilos pour faire
+            transporter un objet. <strong>Soute est le tiers de confiance entre les deux.</strong>
+          </p>
+          <div class="cta-row">
+            <a class="button" href="https://play.google.com/apps/internaltest/4701191682274592788">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M3.6 1.8a1 1 0 0 0-.5.9v18.6a1 1 0 0 0 .5.9l10.1-10.2L3.6 1.8Zm11.6 8.6 2.9-2.9-10.5-6a1.2 1.2 0 0 0-.4-.1l8 9Zm0 3.2-8 9c.1 0 .3 0 .4-.1l10.5-6-2.9-2.9Zm5.6-2.4-2.3-1.3-3.1 3.1 3.1 3.1 2.3-1.3a1.8 1.8 0 0 0 0-3.6Z"
+                />
+              </svg>
+              Rejoindre le test
+            </a>
+            <span class="meta">Android 7 et plus · 24 Mo</span>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone" role="img" aria-label="Aperçu de l'écran de recherche de Soute">
+            <div class="screen">
+              <div class="notch"></div>
+              <h3>Rechercher</h3>
+              <div class="chips">
+                <span class="chip on">Toutes</span>
+                <span class="chip">Casablanca</span>
+                <span class="chip">Alger</span>
+              </div>
+
+              <div class="listing lead-card">
+                <div class="row">
+                  <span class="route">CDG → CMN</span>
+                  <span class="badge">Dernière minute</span>
+                </div>
+                <p class="sub">Paris vers Casablanca · demain · AT785</p>
+                <div class="row">
+                  <div class="who">
+                    <span class="av">YB</span>
+                    <span>Yasmine B.<em class="verified">Identité vérifiée</em></span>
+                  </div>
+                  <div class="price"><b>8,00 €</b><em>par kilo · 8 kg</em></div>
+                </div>
+              </div>
+
+              <div class="listing">
+                <div class="row"><span class="route">ORY → ALG</span></div>
+                <p class="sub">Paris vers Alger · 11 oct. · AH1009</p>
+                <div class="row">
+                  <div class="who">
+                    <span class="av">KM</span>
+                    <span>Karim M.<em class="verified">Identité vérifiée</em></span>
+                  </div>
+                  <div class="price"><b>9,00 €</b><em>par kilo · 5 kg</em></div>
+                </div>
+              </div>
+
+              <div class="listing">
+                <div class="row"><span class="route">CDG → TUN</span></div>
+                <p class="sub">Paris vers Tunis · 12 oct. · TU719</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <section class="card download">
-        <h2>Installer depuis Google Play</h2>
-        <p class="muted">Version 0.1.0 · environ 24 Mo · Android 7 et plus</p>
-        <a
-          class="button"
-          href="https://play.google.com/apps/internaltest/4701191682274592788"
-          >Rejoindre le test et installer</a
-        >
-        <p class="note">
-          Réservé aux testeurs dont l'adresse a été ajoutée au programme. Si tu obtiens une erreur,
-          c'est que ton adresse n'y figure pas encore.
-        </p>
+      <section class="reveal">
+        <h2>Trois étapes</h2>
+        <div class="grid grid-3">
+          <article class="card">
+            <div class="num">1</div>
+            <h3>Ouvre le lien sur ton téléphone</h3>
+            <p>
+              Connecté avec le compte Google actif sur cet appareil. C'est la condition qui bloque
+              le plus souvent.
+            </p>
+          </article>
+          <article class="card">
+            <div class="num">2</div>
+            <h3>Deviens testeur</h3>
+            <p>
+              Une page s'ouvre avec un bouton d'acceptation. Tant qu'il n'est pas cliqué, Google
+              Play ne montrera rien.
+            </p>
+          </article>
+          <article class="card">
+            <div class="num">3</div>
+            <h3>Installe</h3>
+            <p>
+              Comme une application ordinaire. Elle s'appellera <code>fr.soute.app</code> tant que
+              Google n'a pas examiné la fiche.
+            </p>
+          </article>
+        </div>
       </section>
 
-      <section class="card">
-        <h2>Comment ça se passe</h2>
-        <ol class="steps">
-          <li>
-            Ouvre le lien ci-dessus <strong>sur ton téléphone Android</strong>, connecté avec le
-            compte Google actif sur cet appareil.
-          </li>
-          <li>Appuie sur <strong>Devenir testeur</strong>. Cette étape est obligatoire.</li>
-          <li>
-            Appuie ensuite sur le lien vers Google Play qui apparaît, puis installe comme une
-            application ordinaire.
-          </li>
-        </ol>
-        <p class="muted">
-          L'application s'appellera <code>fr.soute.app</code> et non « Soute » tant que Google n'a
-          pas examiné la fiche. C'est normal.
-        </p>
+      <section class="reveal">
+        <h2>Ce qui marche, ce qui ne marche pas</h2>
+        <div class="grid grid-2">
+          <article class="card ok">
+            <h3>Déjà là</h3>
+            <ul class="list yes">
+              <li>Parcourir les annonces, filtrer par destination</li>
+              <li>Le détail des frais qui se recalcule quand tu changes les kilos</li>
+              <li>Le badge dernière minute sous 48 heures avant le vol</li>
+              <li>Thème clair et sombre, suivant le réglage du téléphone</li>
+            </ul>
+          </article>
+          <article class="card todo">
+            <h3>Pas encore</h3>
+            <ul class="list no">
+              <li>Aucun bouton d'action n'est relié : ni connexion, ni réservation, ni paiement</li>
+              <li>Les annonces sont des exemples, pas de vrais vols</li>
+              <li>Ni serveur, ni compte, ni accès réseau</li>
+            </ul>
+            <p class="fine">
+              C'est un aperçu pour juger de l'allure et des parcours, pas une application
+              utilisable.
+            </p>
+          </article>
+        </div>
       </section>
 
-      <section class="card warning">
-        <h2>Ce que fait cette version, et ce qu'elle ne fait pas</h2>
-        <p><strong>Ce qui fonctionne</strong></p>
-        <ul>
-          <li>Parcourir les annonces et filtrer par destination</li>
-          <li>Ouvrir une annonce, faire varier les kilos et voir le détail des frais se recalculer</li>
-          <li>Le thème clair et sombre, qui suit le réglage du téléphone</li>
-        </ul>
-        <p><strong>Ce qui ne fonctionne pas encore</strong></p>
-        <ul>
-          <li>Aucun bouton d'action n'est branché : pas de connexion, pas de réservation, pas de paiement</li>
-          <li>Les annonces affichées sont des exemples, pas de vrais vols</li>
-          <li>L'application n'a ni serveur, ni compte, ni accès réseau</li>
-        </ul>
-        <p class="muted">
-          C'est un aperçu pour juger de l'allure et des parcours, pas une application utilisable.
-        </p>
-      </section>
-
-      <section class="card">
-        <h2>Si Google Play ne fonctionne pas</h2>
-        <p>
-          Le programme de test exige une adresse Gmail ou Google Workspace, inscrite au préalable.
-          À défaut, le fichier d'installation se télécharge directement :
-        </p>
-        <p><a id="apk" href="#">Télécharger le fichier d'installation</a></p>
-        <p class="muted">
-          Android affichera alors un avertissement parce que l'application ne vient pas du Play
-          Store : autorise l'installation depuis cette source, puis choisis « Installer quand
-          même » si Play Protect insiste.
-        </p>
+      <section class="reveal">
+        <h2>Si Google Play refuse</h2>
+        <div class="card">
+          <p>
+            Le programme de test exige une adresse Gmail ou Google Workspace, inscrite au
+            préalable. À défaut, le fichier d'installation se télécharge directement.
+          </p>
+          <p style="margin-top: 1.1rem">
+            <a class="quiet" id="apk" href="#">Télécharger le fichier d'installation</a>
+          </p>
+          <p class="fine">
+            Android avertira que l'application ne vient pas du Play Store : autorise l'installation
+            depuis cette source, puis choisis « Installer quand même » si Play Protect insiste.
+          </p>
+        </div>
       </section>
 
       <footer>
@@ -93,16 +727,44 @@
           <a href="confidentialite.html">Confidentialité</a>
           <a href="suppression-de-compte.html">Suppression de compte</a>
         </nav>
-        <p class="muted">Soute — application en cours de développement</p>
+        <p>Soute — application en cours de développement</p>
       </footer>
     </main>
 
     <script>
-      // Repli hors Google Play. L'URL change a chaque build EAS ; elle est
-      // isolee ici pour n'avoir qu'une ligne a remplacer.
-      var APK_URL =
-        'https://expo.dev/artifacts/eas/O1JQb-4toYKbNP9weV_N24TmPYNsXDLfHGb6RrQ5y2I.apk'
-      document.getElementById('apk').setAttribute('href', APK_URL)
+      // Repli hors Google Play. L'URL change à chaque build EAS : une seule
+      // ligne à remplacer.
+      document
+        .getElementById('apk')
+        .setAttribute(
+          'href',
+          'https://expo.dev/artifacts/eas/O1JQb-4toYKbNP9weV_N24TmPYNsXDLfHGb6RrQ5y2I.apk',
+        )
+
+      // Apparition au défilement, désactivée si l'utilisateur a demandé de
+      // réduire les animations.
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      var items = document.querySelectorAll('.reveal')
+      if (reduced || !('IntersectionObserver' in window)) {
+        items.forEach(function (el) {
+          el.classList.add('seen')
+        })
+      } else {
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) {
+                e.target.classList.add('seen')
+                io.unobserve(e.target)
+              }
+            })
+          },
+          { rootMargin: '0px 0px -12% 0px' },
+        )
+        items.forEach(function (el) {
+          io.observe(el)
+        })
+      }
     </script>
   </body>
 </html>
