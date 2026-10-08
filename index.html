@@ -9,29 +9,43 @@
       content="Soute : réserve les kilos libres d'une valise, ou vends les tiens sur ton prochain vol. Aperçu interne de l'application Android."
     />
     <meta name="robots" content="noindex" />
-    <meta name="theme-color" content="#06100F" />
+    <meta name="theme-color" content="#070C0C" />
     <style>
-      /* ------------------------------------------------------------------
-         Palette issue des tokens de packages/ui, direction "nuit et hublot".
-         Page sombre par défaut : c'est le registre du produit, et c'est là
-         que l'accent sarcelle fonctionne le mieux.
-         ------------------------------------------------------------------ */
+      /* ==================================================================
+         SOUTE — page d'aperçu
+
+         Parti pris : une mise en page éditoriale, pas une page produit.
+         Peu de couleur, beaucoup de blanc tournant, une hiérarchie portée
+         par l'échelle typographique et des filets, pas par des boîtes.
+
+         L'accent sarcelle n'apparaît que trois fois : la pastille d'état,
+         le bouton principal, et les traits actifs. Tout le reste est en
+         valeurs de gris chaudes.
+         ================================================================== */
+
       :root {
-        --bg: #06100f;
-        --bg-2: #0a1a1b;
-        --surface: rgba(255, 255, 255, 0.04);
-        --surface-strong: rgba(255, 255, 255, 0.07);
-        --hairline: rgba(255, 255, 255, 0.1);
-        --hairline-strong: rgba(255, 255, 255, 0.18);
-        --text: #eaf4f2;
-        --text-2: #a9c0bd;
-        --text-3: #74908d;
-        --accent: #46cdba;
-        --accent-deep: #0f8d7d;
-        --on-accent: #04201c;
-        --warn: #e3a845;
-        --radius: 18px;
-        --radius-sm: 11px;
+        --ink: #070c0c;
+        --ink-2: #0b1313;
+        --paper: #eef3f1;
+        --paper-2: #a8bab7;
+        /* Contrastes mesurés sur le fond --ink (#070c0c) :
+           --paper-3 = 4,84:1, conforme AA pour le texte courant ;
+           --paper-4 = 3,57:1, réservé au grand texte et aux éléments
+           d'interface, jamais à du texte courant de petite taille. */
+        --paper-3: #6e8482;
+        --paper-4: #556d6a;
+        --rule: rgba(238, 243, 241, 0.11);
+        --rule-2: rgba(238, 243, 241, 0.2);
+        --accent: #4ad4c0;
+        --accent-ink: #042320;
+        --amber: #e0a94c;
+        --green: #63cb82;
+
+        --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, monospace;
+        --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+
+        --gutter: clamp(1.25rem, 4vw, 3.5rem);
+        --measure: 78rem;
       }
 
       * {
@@ -40,496 +54,687 @@
 
       html {
         scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
       }
 
       body {
         margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        line-height: 1.6;
+        background: var(--ink);
+        color: var(--paper);
+        font-family: var(--sans);
+        font-size: 17px;
+        line-height: 1.55;
         -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
         overflow-x: hidden;
       }
 
-      /* Halo de fond. Deux taches qui dérivent lentement : ça donne de la
-         profondeur sans image et sans coût de chargement. */
-      body::before {
-        content: '';
-        position: fixed;
-        inset: -30vh -30vw;
-        z-index: -1;
-        background:
-          radial-gradient(42vw 42vw at 18% 8%, rgba(70, 205, 186, 0.16), transparent 62%),
-          radial-gradient(38vw 38vw at 86% 32%, rgba(27, 91, 134, 0.18), transparent 60%),
-          radial-gradient(50vw 50vw at 50% 100%, rgba(15, 141, 125, 0.1), transparent 65%);
-        animation: drift 26s ease-in-out infinite alternate;
-      }
-
-      @keyframes drift {
-        from {
-          transform: translate3d(0, 0, 0) scale(1);
-        }
-        to {
-          transform: translate3d(-3%, 2%, 0) scale(1.08);
-        }
-      }
-
-      /* Grille fine, très discrète, pour l'effet technique. */
+      /* Grain. Une texture très faible qui casse l'aplat numérique ;
+         c'est ce qui distingue un fond sombre travaillé d'un #000 posé. */
       body::after {
         content: '';
         position: fixed;
         inset: 0;
-        z-index: -1;
+        z-index: 9999;
         pointer-events: none;
-        background-image:
-          linear-gradient(var(--hairline) 1px, transparent 1px),
-          linear-gradient(90deg, var(--hairline) 1px, transparent 1px);
-        background-size: 64px 64px;
-        mask-image: radial-gradient(70% 55% at 50% 22%, #000 0%, transparent 78%);
-        opacity: 0.35;
+        opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
       }
 
-      main {
-        max-width: 72rem;
+      /* Lueur unique, froide, haut-gauche. Pas de dégradé multicolore. */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: -40vh -20vw auto;
+        height: 120vh;
+        z-index: -1;
+        background: radial-gradient(
+          48vw 48vw at 22% 18%,
+          rgba(74, 212, 192, 0.1),
+          transparent 68%
+        );
+      }
+
+      .shell {
+        max-width: var(--measure);
         margin: 0 auto;
-        padding: 3.5rem 1.5rem 5rem;
+        padding: 0 var(--gutter);
       }
 
-      /* ---------- En-tête ---------- */
-      .hero {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 3rem;
+      /* ---------------- Barre ---------------- */
+      .bar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(12px) saturate(140%);
+        -webkit-backdrop-filter: blur(12px) saturate(140%);
+        background: rgba(7, 12, 12, 0.72);
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .bar .shell {
+        display: flex;
         align-items: center;
-        padding: 2rem 0 4rem;
+        justify-content: space-between;
+        height: 62px;
       }
 
-      @media (min-width: 62rem) {
-        .hero {
-          grid-template-columns: 1.05fr 0.95fr;
-          gap: 4rem;
-          padding: 3rem 0 6rem;
-        }
+      .word {
+        font-size: 1.0625rem;
+        font-weight: 620;
+        letter-spacing: -0.025em;
       }
 
-      .tag {
+      .state {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.3rem 0.7rem 0.3rem 0.45rem;
-        border: 1px solid var(--hairline-strong);
-        border-radius: 999px;
-        background: var(--surface);
-        color: var(--text-2);
-        font-size: 0.78rem;
-        letter-spacing: 0.06em;
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
+        color: var(--paper-3);
       }
 
-      .dot {
-        width: 7px;
-        height: 7px;
+      .led {
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
         background: var(--accent);
-        box-shadow: 0 0 0 3px rgba(70, 205, 186, 0.18);
-        animation: pulse 2.4s ease-in-out infinite;
+        box-shadow: 0 0 10px 1px rgba(74, 212, 192, 0.8);
+        animation: blink 3s ease-in-out infinite;
       }
 
-      @keyframes pulse {
+      @keyframes blink {
         0%,
         100% {
           opacity: 1;
         }
-        50% {
-          opacity: 0.35;
+        55% {
+          opacity: 0.3;
         }
       }
 
-      h1 {
-        margin: 1.25rem 0 0;
-        font-size: clamp(3rem, 9vw, 5.25rem);
-        line-height: 0.98;
-        letter-spacing: -0.045em;
-        font-weight: 680;
-        background: linear-gradient(170deg, #ffffff 18%, #9fd8cf 58%, var(--accent) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-
-      .lead {
-        margin: 1.25rem 0 0;
-        max-width: 34rem;
-        color: var(--text-2);
-        font-size: clamp(1.0625rem, 2.2vw, 1.25rem);
-      }
-
-      .lead strong {
-        color: var(--text);
-        font-weight: 600;
-      }
-
-      .cta-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 1rem;
-        margin-top: 2.25rem;
-      }
-
-      .button {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.6rem;
-        min-height: 54px;
-        padding: 0 1.6rem;
-        border-radius: var(--radius-sm);
-        background: linear-gradient(180deg, var(--accent), var(--accent-deep));
-        color: var(--on-accent);
-        font-size: 1.03rem;
-        font-weight: 650;
-        letter-spacing: -0.01em;
-        text-decoration: none;
-        box-shadow:
-          0 1px 0 rgba(255, 255, 255, 0.3) inset,
-          0 14px 34px -12px rgba(70, 205, 186, 0.6);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-      }
-
-      .button:hover {
-        transform: translateY(-2px);
-        box-shadow:
-          0 1px 0 rgba(255, 255, 255, 0.35) inset,
-          0 20px 44px -12px rgba(70, 205, 186, 0.72);
-      }
-
-      .button:focus-visible {
-        outline: 3px solid var(--accent);
-        outline-offset: 3px;
-      }
-
-      .button svg {
-        width: 19px;
-        height: 19px;
-      }
-
-      .meta {
-        color: var(--text-3);
-        font-size: 0.9rem;
-      }
-
-      /* ---------- Téléphone ---------- */
-      .phone-wrap {
-        display: flex;
-        justify-content: center;
-        perspective: 1400px;
-      }
-
-      .phone {
-        position: relative;
-        width: 290px;
-        border-radius: 38px;
-        padding: 10px;
-        background: linear-gradient(160deg, #27383a, #0c1718);
-        box-shadow:
-          0 0 0 1px var(--hairline-strong),
-          0 50px 90px -30px rgba(0, 0, 0, 0.9),
-          0 0 80px -30px rgba(70, 205, 186, 0.45);
-        transform: rotateY(-13deg) rotateX(4deg) rotateZ(1deg);
-        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      .phone:hover {
-        transform: rotateY(-6deg) rotateX(2deg);
-      }
-
-      .screen {
-        border-radius: 29px;
-        background: #0a1315;
-        padding: 1.4rem 0.95rem 1rem;
-        overflow: hidden;
-      }
-
-      .notch {
-        width: 86px;
-        height: 5px;
-        margin: 0 auto 1.1rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.16);
-      }
-
-      .screen h3 {
-        margin: 0 0 0.9rem;
-        font-size: 0.95rem;
-        letter-spacing: -0.01em;
-      }
-
-      .chips {
-        display: flex;
-        gap: 0.4rem;
-        margin-bottom: 0.9rem;
-      }
-
-      .chip {
-        padding: 0.2rem 0.55rem;
-        border: 1px solid var(--hairline);
-        border-radius: 7px;
-        font-size: 0.68rem;
-        color: var(--text-3);
-      }
-
-      .chip.on {
-        border-color: rgba(70, 205, 186, 0.5);
-        background: rgba(70, 205, 186, 0.14);
-        color: var(--accent);
-      }
-
-      .listing {
-        border: 1px solid var(--hairline);
-        border-radius: 13px;
-        background: rgba(255, 255, 255, 0.035);
-        padding: 0.8rem;
-        margin-bottom: 0.6rem;
-      }
-
-      .listing.lead-card {
-        border-color: rgba(227, 168, 69, 0.34);
-      }
-
-      .row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .route {
-        font-size: 1rem;
-        font-weight: 650;
-        letter-spacing: -0.01em;
-      }
-
-      .badge {
-        padding: 0.12rem 0.42rem;
-        border-radius: 6px;
-        background: rgba(227, 168, 69, 0.17);
-        color: var(--warn);
-        font-size: 0.6rem;
-      }
-
-      .sub {
-        margin: 0.25rem 0 0.7rem;
-        color: var(--text-3);
-        font-size: 0.72rem;
-      }
-
-      .who {
-        display: flex;
-        align-items: center;
-        gap: 0.45rem;
-      }
-
-      .av {
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
+      /* ---------------- Ouverture ---------------- */
+      .open {
+        padding: clamp(3.5rem, 9vw, 7.5rem) 0 clamp(3rem, 7vw, 5.5rem);
         display: grid;
-        place-items: center;
-        background: rgba(70, 205, 186, 0.17);
-        color: var(--accent);
-        font-size: 0.62rem;
-        font-weight: 600;
-      }
-
-      .who span {
-        font-size: 0.71rem;
-        color: var(--text-2);
-      }
-
-      .verified {
-        display: block;
-        color: #5fc97e;
-        font-size: 0.62rem;
-      }
-
-      .price {
-        text-align: right;
-      }
-
-      .price b {
-        font-size: 0.98rem;
-        letter-spacing: -0.01em;
-      }
-
-      .price em {
-        display: block;
-        font-style: normal;
-        color: var(--text-3);
-        font-size: 0.62rem;
-      }
-
-      /* ---------- Sections ---------- */
-      section {
-        margin: 4.5rem 0 0;
-      }
-
-      h2 {
-        margin: 0 0 1.5rem;
-        font-size: clamp(1.5rem, 3.4vw, 2.1rem);
-        letter-spacing: -0.03em;
-        font-weight: 650;
-      }
-
-      .grid {
-        display: grid;
-        gap: 1rem;
+        gap: clamp(3rem, 7vw, 5rem);
         grid-template-columns: 1fr;
       }
 
-      @media (min-width: 48rem) {
-        .grid-3 {
-          grid-template-columns: repeat(3, 1fr);
-        }
-        .grid-2 {
-          grid-template-columns: repeat(2, 1fr);
+      @media (min-width: 64rem) {
+        .open {
+          grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+          align-items: center;
         }
       }
 
-      .card {
+      .kicker {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.17em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin: 0 0 1.5rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.9rem, 7.4vw, 5.1rem);
+        line-height: 0.96;
+        letter-spacing: -0.045em;
+        font-weight: 600;
+        text-wrap: balance;
+      }
+
+      h1 em {
+        font-style: normal;
+        color: var(--paper-4);
+      }
+
+      .deck {
+        margin: 1.75rem 0 0;
+        max-width: 31rem;
+        font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
+        color: var(--paper-2);
+        text-wrap: pretty;
+      }
+
+      .deck b {
+        color: var(--paper);
+        font-weight: 550;
+      }
+
+      .acts {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.9rem 1.5rem;
+        margin-top: 2.5rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        height: 52px;
+        padding: 0 1.5rem;
+        border-radius: 8px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-size: 1rem;
+        font-weight: 620;
+        letter-spacing: -0.012em;
+        text-decoration: none;
+        transition: background 0.2s ease, transform 0.2s ease;
+      }
+
+      .btn:hover {
+        background: #65e3d1;
+        transform: translateY(-1px);
+      }
+
+      .btn:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .alt {
+        display: inline-flex;
+        align-items: center;
+        height: 52px;
+        color: var(--paper-2);
+        font-size: 0.96rem;
+        text-decoration: none;
+        border-bottom: 1px solid var(--rule-2);
+        transition: color 0.2s ease, border-color 0.2s ease;
+      }
+
+      .alt:hover {
+        color: var(--paper);
+        border-color: var(--accent);
+      }
+
+      /* ---------------- Appareils ---------------- */
+      .devices {
         position: relative;
-        border: 1px solid var(--hairline);
-        border-radius: var(--radius);
-        background: var(--surface);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        padding: 1.6rem;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 520px;
+      }
+
+      .dev {
+        width: 252px;
+        border-radius: 34px;
+        padding: 9px;
+        background: linear-gradient(150deg, #1d2a2a 0%, #0a1111 62%);
+        box-shadow:
+          0 0 0 1px rgba(238, 243, 241, 0.09),
+          0 44px 70px -34px rgba(0, 0, 0, 0.95);
+      }
+
+      .dev .glass {
+        border-radius: 26px;
+        background: var(--ink-2);
+        padding: 1.15rem 0.85rem 0.9rem;
         overflow: hidden;
       }
 
-      .card::before {
-        content: '';
+      .dev.back {
         position: absolute;
-        inset: 0 0 auto;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, var(--hairline-strong), transparent);
+        top: 0;
+        left: 50%;
+        transform: translateX(-88%) rotate(-7deg) scale(0.93);
+        opacity: 0.55;
+        filter: saturate(0.6);
       }
 
-      .num {
-        display: grid;
-        place-items: center;
-        width: 34px;
-        height: 34px;
-        margin-bottom: 0.9rem;
-        border: 1px solid rgba(70, 205, 186, 0.35);
-        border-radius: 10px;
-        background: rgba(70, 205, 186, 0.1);
-        color: var(--accent);
-        font-size: 0.85rem;
-        font-weight: 650;
+      .dev.front {
+        position: relative;
+        transform: translateX(12%) rotate(2.5deg);
+        z-index: 2;
       }
 
-      .card h3 {
-        margin: 0 0 0.45rem;
-        font-size: 1.03rem;
+      @media (max-width: 40rem) {
+        .devices {
+          min-height: 470px;
+        }
+        .dev.back {
+          transform: translateX(-80%) rotate(-8deg) scale(0.86);
+          opacity: 0.4;
+        }
+        .dev.front {
+          transform: translateX(16%) rotate(2deg) scale(0.94);
+        }
+      }
+
+      .pill {
+        width: 76px;
+        height: 4px;
+        margin: 0 auto 1.05rem;
+        border-radius: 99px;
+        background: rgba(238, 243, 241, 0.15);
+      }
+
+      .scr-h {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.85rem;
+      }
+
+      .scr-h b {
+        font-size: 0.9rem;
         letter-spacing: -0.015em;
       }
 
-      .card p {
+      .scr-h span {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        color: var(--paper-4);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 0.33rem;
+        margin-bottom: 0.85rem;
+      }
+
+      .tab {
+        padding: 0.17rem 0.5rem;
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        font-size: 0.63rem;
+        color: var(--paper-4);
+      }
+
+      .tab.on {
+        border-color: rgba(74, 212, 192, 0.45);
+        color: var(--accent);
+      }
+
+      .ad {
+        border-top: 1px solid var(--rule);
+        padding: 0.75rem 0 0.7rem;
+      }
+
+      .ad:last-child {
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .ad-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .iata {
+        font-size: 0.94rem;
+        font-weight: 620;
+        letter-spacing: -0.01em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .flag {
+        padding: 0.08rem 0.36rem;
+        border-radius: 4px;
+        background: rgba(224, 169, 76, 0.15);
+        color: var(--amber);
+        font-family: var(--mono);
+        font-size: 0.55rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .ad-sub {
+        margin: 0.2rem 0 0.6rem;
+        color: var(--paper-4);
+        font-size: 0.68rem;
+      }
+
+      .ad-bot {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .person {
+        display: flex;
+        align-items: center;
+        gap: 0.42rem;
+      }
+
+      .face {
+        width: 23px;
+        height: 23px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(74, 212, 192, 0.14);
+        color: var(--accent);
+        font-size: 0.58rem;
+        font-weight: 600;
+      }
+
+      .person i {
+        font-style: normal;
+        font-size: 0.68rem;
+        color: var(--paper-2);
+      }
+
+      .ok {
+        display: block;
+        color: var(--green);
+        font-size: 0.58rem;
+      }
+
+      .amt {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .amt b {
+        font-size: 0.92rem;
+        letter-spacing: -0.015em;
+      }
+
+      .amt i {
+        display: block;
+        font-style: normal;
+        color: var(--paper-4);
+        font-size: 0.58rem;
+      }
+
+      /* Écran de détail : la ventilation des frais, cœur du produit */
+      .calc {
+        margin-top: 0.3rem;
+      }
+
+      .calc-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.33rem 0;
+        font-size: 0.7rem;
+        color: var(--paper-2);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .calc-row.total {
+        margin-top: 0.3rem;
+        padding-top: 0.55rem;
+        border-top: 1px solid var(--rule-2);
+        color: var(--paper);
+        font-weight: 620;
+        font-size: 0.82rem;
+      }
+
+      .calc-note {
+        margin: 0.7rem 0 0;
+        padding: 0.5rem 0.6rem;
+        border-radius: 7px;
+        background: rgba(74, 212, 192, 0.08);
+        color: var(--accent);
+        font-size: 0.6rem;
+        line-height: 1.45;
+      }
+
+      .stepper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0.55rem 0 0.85rem;
+        padding: 0.4rem 0.5rem;
+        border: 1px solid var(--rule);
+        border-radius: 9px;
+      }
+
+      .stepper span {
+        font-size: 0.95rem;
+        font-weight: 620;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .sq {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--rule-2);
+        border-radius: 6px;
+        color: var(--paper-2);
+        font-size: 0.8rem;
+      }
+
+      /* ---------------- Bandeau de chiffres ---------------- */
+      .strip {
+        border-top: 1px solid var(--rule);
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .strip .shell {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (min-width: 48rem) {
+        .strip .shell {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      .fig {
+        padding: 1.6rem 0;
+        border-right: 1px solid var(--rule);
+      }
+
+      .fig:last-child {
+        border-right: 0;
+      }
+
+      @media (max-width: 47.99rem) {
+        .fig:nth-child(2n) {
+          border-right: 0;
+        }
+        .fig:nth-child(-n + 2) {
+          border-bottom: 1px solid var(--rule);
+        }
+      }
+
+      .fig b {
+        display: block;
+        font-size: 1.65rem;
+        font-weight: 600;
+        letter-spacing: -0.035em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .fig span {
+        font-family: var(--mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--paper-3);
+      }
+
+      /* ---------------- Sections ---------------- */
+      section {
+        padding: clamp(3.5rem, 8vw, 6.5rem) 0;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .head {
+        display: grid;
+        gap: 0.9rem;
+        margin-bottom: clamp(2.25rem, 4vw, 3.25rem);
+      }
+
+      @media (min-width: 52rem) {
+        .head {
+          grid-template-columns: 1fr 1.5fr;
+          align-items: start;
+          gap: 3rem;
+        }
+      }
+
+      h2 {
         margin: 0;
-        color: var(--text-2);
-        font-size: 0.945rem;
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        letter-spacing: -0.035em;
+        font-weight: 600;
+        text-wrap: balance;
       }
 
-      .card.ok {
-        border-color: rgba(95, 201, 126, 0.26);
+      .head p {
+        margin: 0;
+        color: var(--paper-2);
+        max-width: 36rem;
       }
 
-      .card.todo {
-        border-color: rgba(227, 168, 69, 0.24);
+      /* Étapes : filets et numéros en chasse fixe, pas de cartes */
+      .steps {
+        display: grid;
+        gap: 0;
+        grid-template-columns: 1fr;
+        counter-reset: s;
       }
 
-      .list {
-        margin: 0.9rem 0 0;
+      @media (min-width: 52rem) {
+        .steps {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0 2.5rem;
+        }
+      }
+
+      .step {
+        counter-increment: s;
+        padding: 1.6rem 0;
+        border-top: 1px solid var(--rule-2);
+      }
+
+      .step::before {
+        content: '0' counter(s);
+        display: block;
+        margin-bottom: 0.9rem;
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+      }
+
+      .step h3 {
+        margin: 0 0 0.4rem;
+        font-size: 1.0625rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .step p {
+        margin: 0;
+        color: var(--paper-2);
+        font-size: 0.96rem;
+      }
+
+      /* Deux colonnes séparées par un filet, sans chrome */
+      .split {
+        display: grid;
+        gap: 2.5rem;
+        grid-template-columns: 1fr;
+      }
+
+      @media (min-width: 52rem) {
+        .split {
+          grid-template-columns: 1fr 1fr;
+          gap: 4rem;
+        }
+        .split > div + div {
+          padding-left: 4rem;
+          border-left: 1px solid var(--rule);
+          margin-left: -2rem;
+        }
+      }
+
+      .split h3 {
+        margin: 0 0 1.1rem;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--paper-3);
+      }
+
+      .ticks {
+        margin: 0;
         padding: 0;
         list-style: none;
       }
 
-      .list li {
-        position: relative;
-        padding-left: 1.5rem;
-        margin-bottom: 0.5rem;
-        color: var(--text-2);
-        font-size: 0.945rem;
+      .ticks li {
+        display: grid;
+        grid-template-columns: 1.4rem 1fr;
+        gap: 0.25rem;
+        padding: 0.65rem 0;
+        border-top: 1px solid var(--rule);
+        color: var(--paper-2);
+        font-size: 0.97rem;
       }
 
-      .list li::before {
-        position: absolute;
-        left: 0;
-        top: -0.02em;
-        font-weight: 700;
+      .ticks li::before {
+        font-family: var(--mono);
+        font-size: 0.85rem;
       }
 
-      .list.yes li::before {
-        content: '✓';
-        color: #5fc97e;
+      .ticks.yes li::before {
+        content: '+';
+        color: var(--green);
       }
 
-      .list.no li::before {
-        content: '—';
-        color: var(--warn);
+      .ticks.no li::before {
+        content: '–';
+        color: var(--amber);
       }
 
-      .fine {
-        margin-top: 1rem;
-        color: var(--text-3);
-        font-size: 0.86rem;
+      .aside {
+        margin: 1.4rem 0 0;
+        color: var(--paper-3);
+        font-size: 0.9rem;
       }
 
       code {
-        padding: 0.1em 0.42em;
-        border: 1px solid var(--hairline);
-        border-radius: 5px;
-        background: rgba(0, 0, 0, 0.35);
+        font-family: var(--mono);
         font-size: 0.88em;
+        color: var(--paper);
       }
 
-      a {
-        color: var(--accent);
-      }
-
-      .quiet {
-        display: inline-flex;
-        align-items: center;
-        min-height: 48px;
-        color: var(--text-2);
-        text-decoration: none;
-        border-bottom: 1px solid var(--hairline-strong);
-      }
-
-      .quiet:hover {
-        color: var(--text);
-      }
-
+      /* ---------------- Pied ---------------- */
       footer {
-        margin-top: 5rem;
-        padding-top: 1.75rem;
-        border-top: 1px solid var(--hairline);
+        padding: 2.75rem 0 3.5rem;
+      }
+
+      footer .shell {
         display: flex;
         flex-wrap: wrap;
-        gap: 1rem 2rem;
-        align-items: center;
+        gap: 1.1rem 2.25rem;
+        align-items: baseline;
         justify-content: space-between;
       }
 
       footer nav {
         display: flex;
         flex-wrap: wrap;
-        gap: 1.75rem;
+        gap: 2rem;
       }
 
       footer a {
-        color: var(--text-2);
+        color: var(--paper-2);
         text-decoration: none;
         font-size: 0.93rem;
       }
@@ -540,35 +745,34 @@
 
       footer p {
         margin: 0;
-        color: var(--text-3);
-        font-size: 0.86rem;
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        /* Texte réel et petit : il faut --paper-3, pas --paper-4. */
+        color: var(--paper-3);
       }
 
-      /* Apparition au défilement, purement décorative. */
-      .reveal {
+      /* Apparition sobre : 10 px et de l'opacité, rien de plus */
+      .rv {
         opacity: 0;
-        transform: translateY(18px);
-        transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        transform: translateY(10px);
+        transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
-      .reveal.seen {
+      .rv.in {
         opacity: 1;
         transform: none;
       }
 
-      /* Le réglage système prime sur toute l'animation. */
       @media (prefers-reduced-motion: reduce) {
         *,
-        body::before,
-        .dot {
+        .led {
           animation: none !important;
           transition: none !important;
         }
-        .reveal {
+        .rv {
           opacity: 1;
-          transform: none;
-        }
-        .phone {
           transform: none;
         }
         html {
@@ -579,187 +783,240 @@
   </head>
 
   <body>
+    <header class="bar">
+      <div class="shell">
+        <span class="word">Soute</span>
+        <span class="state"><span class="led"></span> Aperçu interne — v0.1.0</span>
+      </div>
+    </header>
+
     <main>
-      <header class="hero">
-        <div>
-          <span class="tag"><span class="dot"></span> Aperçu interne · v0.1.0</span>
-          <h1>Des kilos qui voyagent déjà</h1>
-          <p class="lead">
-            Un voyageur a de la place dans sa valise. Un expéditeur réserve des kilos pour faire
-            transporter un objet. <strong>Soute est le tiers de confiance entre les deux.</strong>
-          </p>
-          <div class="cta-row">
-            <a class="button" href="https://play.google.com/apps/internaltest/4701191682274592788">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M3.6 1.8a1 1 0 0 0-.5.9v18.6a1 1 0 0 0 .5.9l10.1-10.2L3.6 1.8Zm11.6 8.6 2.9-2.9-10.5-6a1.2 1.2 0 0 0-.4-.1l8 9Zm0 3.2-8 9c.1 0 .3 0 .4-.1l10.5-6-2.9-2.9Zm5.6-2.4-2.3-1.3-3.1 3.1 3.1 3.1 2.3-1.3a1.8 1.8 0 0 0 0-3.6Z"
-                />
-              </svg>
-              Rejoindre le test
-            </a>
-            <span class="meta">Android 7 et plus · 24 Mo</span>
+      <div class="shell">
+        <div class="open">
+          <div>
+            <p class="kicker">Marketplace de kilos en soute</p>
+            <h1>Des kilos qui<br />voyagent <em>déjà</em></h1>
+            <p class="deck">
+              Un voyageur a de la place dans sa valise. Un expéditeur réserve des kilos pour faire
+              transporter un objet. <b>Soute est le tiers de confiance entre les deux :</b>
+              identité vérifiée, paiement conservé jusqu'à la livraison, contenu inspecté à la
+              remise.
+            </p>
+            <div class="acts">
+              <a class="btn" href="https://play.google.com/apps/internaltest/4701191682274592788">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M3.6 1.8a1 1 0 0 0-.5.9v18.6a1 1 0 0 0 .5.9l10.1-10.2L3.6 1.8Zm11.6 8.6 2.9-2.9-10.5-6a1.2 1.2 0 0 0-.4-.1l8 9Zm0 3.2-8 9c.1 0 .3 0 .4-.1l10.5-6-2.9-2.9Zm5.6-2.4-2.3-1.3-3.1 3.1 3.1 3.1 2.3-1.3a1.8 1.8 0 0 0 0-3.6Z"
+                  />
+                </svg>
+                Rejoindre le test
+              </a>
+              <a class="alt" id="apk" href="#">Ou télécharger le fichier directement</a>
+            </div>
           </div>
-        </div>
 
-        <div class="phone-wrap">
-          <div class="phone" role="img" aria-label="Aperçu de l'écran de recherche de Soute">
-            <div class="screen">
-              <div class="notch"></div>
-              <h3>Rechercher</h3>
-              <div class="chips">
-                <span class="chip on">Toutes</span>
-                <span class="chip">Casablanca</span>
-                <span class="chip">Alger</span>
-              </div>
-
-              <div class="listing lead-card">
-                <div class="row">
-                  <span class="route">CDG → CMN</span>
-                  <span class="badge">Dernière minute</span>
+          <div class="devices" role="img" aria-label="Aperçu des écrans de recherche et de détail d'une annonce">
+            <!-- Écran arrière : la recherche -->
+            <div class="dev back" aria-hidden="true">
+              <div class="glass">
+                <div class="pill"></div>
+                <div class="scr-h"><b>Rechercher</b><span>8 annonces</span></div>
+                <div class="tabs">
+                  <span class="tab on">Toutes</span><span class="tab">Alger</span
+                  ><span class="tab">Tunis</span>
                 </div>
-                <p class="sub">Paris vers Casablanca · demain · AT785</p>
-                <div class="row">
-                  <div class="who">
-                    <span class="av">YB</span>
-                    <span>Yasmine B.<em class="verified">Identité vérifiée</em></span>
+                <div class="ad">
+                  <div class="ad-top">
+                    <span class="iata">ORY → ALG</span>
                   </div>
-                  <div class="price"><b>8,00 €</b><em>par kilo · 8 kg</em></div>
-                </div>
-              </div>
-
-              <div class="listing">
-                <div class="row"><span class="route">ORY → ALG</span></div>
-                <p class="sub">Paris vers Alger · 11 oct. · AH1009</p>
-                <div class="row">
-                  <div class="who">
-                    <span class="av">KM</span>
-                    <span>Karim M.<em class="verified">Identité vérifiée</em></span>
+                  <p class="ad-sub">Paris vers Alger · 11 oct. · AH1009</p>
+                  <div class="ad-bot">
+                    <div class="person">
+                      <span class="face">KM</span><i>Karim M.<em class="ok">Vérifié</em></i>
+                    </div>
+                    <div class="amt"><b>9,00 €</b><i>par kilo</i></div>
                   </div>
-                  <div class="price"><b>9,00 €</b><em>par kilo · 5 kg</em></div>
+                </div>
+                <div class="ad">
+                  <div class="ad-top"><span class="iata">CDG → DSS</span></div>
+                  <p class="ad-sub">Paris vers Dakar · 15 oct. · AF718</p>
+                  <div class="ad-bot">
+                    <div class="person">
+                      <span class="face">MD</span><i>Moussa D.<em class="ok">Vérifié</em></i>
+                    </div>
+                    <div class="amt"><b>11,00 €</b><i>par kilo</i></div>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div class="listing">
-                <div class="row"><span class="route">CDG → TUN</span></div>
-                <p class="sub">Paris vers Tunis · 12 oct. · TU719</p>
+            <!-- Écran avant : le détail et la ventilation des frais -->
+            <div class="dev front">
+              <div class="glass">
+                <div class="pill"></div>
+                <div class="scr-h"><b>Paris → Casablanca</b><span>AT785</span></div>
+
+                <div class="ad" style="border-top: 0; padding-top: 0">
+                  <div class="ad-top">
+                    <span class="iata">CDG → CMN</span>
+                    <span class="flag">Dernière minute</span>
+                  </div>
+                  <p class="ad-sub">Demain · Royal Air Maroc</p>
+                  <div class="ad-bot">
+                    <div class="person">
+                      <span class="face">YB</span
+                      ><i>Yasmine B.<em class="ok">Identité vérifiée · 23 livraisons</em></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="stepper">
+                  <span class="sq">−</span><span>5 kg</span><span class="sq">+</span>
+                </div>
+
+                <div class="calc">
+                  <div class="calc-row"><span>5 kg à 8,00 €</span><span>40,00 €</span></div>
+                  <div class="calc-row"><span>Frais de service</span><span>4,99 €</span></div>
+                  <div class="calc-row total"><span>Total</span><span>44,99 €</span></div>
+                </div>
+
+                <p class="calc-note">
+                  Le voyageur reçoit 40,00 €, intégralement. Ton paiement est conservé jusqu'à la
+                  livraison.
+                </p>
               </div>
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      <section class="reveal">
-        <h2>Trois étapes</h2>
-        <div class="grid grid-3">
-          <article class="card">
-            <div class="num">1</div>
-            <h3>Ouvre le lien sur ton téléphone</h3>
-            <p>
-              Connecté avec le compte Google actif sur cet appareil. C'est la condition qui bloque
-              le plus souvent.
-            </p>
-          </article>
-          <article class="card">
-            <div class="num">2</div>
-            <h3>Deviens testeur</h3>
-            <p>
-              Une page s'ouvre avec un bouton d'acceptation. Tant qu'il n'est pas cliqué, Google
-              Play ne montrera rien.
-            </p>
-          </article>
-          <article class="card">
-            <div class="num">3</div>
-            <h3>Installe</h3>
-            <p>
-              Comme une application ordinaire. Elle s'appellera <code>fr.soute.app</code> tant que
-              Google n'a pas examiné la fiche.
-            </p>
-          </article>
+      <div class="strip">
+        <div class="shell">
+          <div class="fig"><b>8</b><span>routes</span></div>
+          <div class="fig"><b>24 Mo</b><span>à installer</span></div>
+          <div class="fig"><b>Android 7</b><span>et plus</span></div>
+          <div class="fig"><b>0</b><span>donnée collectée</span></div>
         </div>
-      </section>
+      </div>
 
-      <section class="reveal">
-        <h2>Ce qui marche, ce qui ne marche pas</h2>
-        <div class="grid grid-2">
-          <article class="card ok">
-            <h3>Déjà là</h3>
-            <ul class="list yes">
-              <li>Parcourir les annonces, filtrer par destination</li>
-              <li>Le détail des frais qui se recalcule quand tu changes les kilos</li>
-              <li>Le badge dernière minute sous 48 heures avant le vol</li>
-              <li>Thème clair et sombre, suivant le réglage du téléphone</li>
-            </ul>
-          </article>
-          <article class="card todo">
-            <h3>Pas encore</h3>
-            <ul class="list no">
-              <li>Aucun bouton d'action n'est relié : ni connexion, ni réservation, ni paiement</li>
-              <li>Les annonces sont des exemples, pas de vrais vols</li>
-              <li>Ni serveur, ni compte, ni accès réseau</li>
-            </ul>
-            <p class="fine">
-              C'est un aperçu pour juger de l'allure et des parcours, pas une application
-              utilisable.
+      <div class="shell">
+        <section class="rv">
+          <div class="head">
+            <h2>Trois étapes</h2>
+            <p>
+              L'installation passe par le programme de test de Google Play. Compte une minute, à
+              condition d'utiliser le bon compte.
             </p>
-          </article>
-        </div>
-      </section>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <h3>Ouvre le lien sur ton téléphone</h3>
+              <p>
+                Connecté avec le compte Google actif sur cet appareil. C'est la condition qui
+                bloque le plus souvent.
+              </p>
+            </article>
+            <article class="step">
+              <h3>Deviens testeur</h3>
+              <p>
+                Une page s'ouvre avec un bouton d'acceptation. Tant qu'il n'est pas cliqué, Google
+                Play ne montrera rien.
+              </p>
+            </article>
+            <article class="step">
+              <h3>Installe</h3>
+              <p>
+                Comme une application ordinaire. Elle s'appellera <code>fr.soute.app</code> tant
+                que Google n'a pas examiné la fiche.
+              </p>
+            </article>
+          </div>
+        </section>
 
-      <section class="reveal">
-        <h2>Si Google Play refuse</h2>
-        <div class="card">
-          <p>
-            Le programme de test exige une adresse Gmail ou Google Workspace, inscrite au
-            préalable. À défaut, le fichier d'installation se télécharge directement.
-          </p>
-          <p style="margin-top: 1.1rem">
-            <a class="quiet" id="apk" href="#">Télécharger le fichier d'installation</a>
-          </p>
-          <p class="fine">
-            Android avertira que l'application ne vient pas du Play Store : autorise l'installation
-            depuis cette source, puis choisis « Installer quand même » si Play Protect insiste.
-          </p>
-        </div>
-      </section>
+        <section class="rv">
+          <div class="head">
+            <h2>Ce qui marche,<br />ce qui ne marche pas</h2>
+            <p>
+              C'est un aperçu destiné à juger de l'allure et des parcours. Autant être précis sur
+              ce qu'il ne fait pas encore.
+            </p>
+          </div>
+          <div class="split">
+            <div>
+              <h3>Déjà là</h3>
+              <ul class="ticks yes">
+                <li>Parcourir les annonces et filtrer par destination</li>
+                <li>Le détail des frais, recalculé quand tu changes les kilos</li>
+                <li>Le badge dernière minute sous 48 heures avant le vol</li>
+                <li>Thème clair et sombre, suivant le réglage du téléphone</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Pas encore</h3>
+              <ul class="ticks no">
+                <li>Aucun bouton d'action relié : ni connexion, ni réservation, ni paiement</li>
+                <li>Les annonces sont des exemples, pas de vrais vols</li>
+                <li>Ni serveur, ni compte, ni accès réseau</li>
+              </ul>
+              <p class="aside">
+                Le calcul des frais, lui, est le vrai code de production. Ce que tu vois à l'écran
+                est ce qui sera facturé.
+              </p>
+            </div>
+          </div>
+        </section>
 
-      <footer>
+        <section class="rv">
+          <div class="head">
+            <h2>Si Google Play refuse</h2>
+            <p>
+              Le programme de test exige une adresse Gmail ou Google Workspace inscrite au
+              préalable. À défaut, le fichier d'installation se télécharge directement. Android
+              avertira que l'application ne vient pas du Play Store : autorise l'installation
+              depuis cette source, puis choisis « Installer quand même » si Play Protect insiste.
+            </p>
+          </div>
+          <a class="alt" id="apk2" href="#">Télécharger le fichier d'installation</a>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <div class="shell">
         <nav>
           <a href="confidentialite.html">Confidentialité</a>
           <a href="suppression-de-compte.html">Suppression de compte</a>
         </nav>
-        <p>Soute — application en cours de développement</p>
-      </footer>
-    </main>
+        <p>Soute — en développement</p>
+      </div>
+    </footer>
 
     <script>
       // Repli hors Google Play. L'URL change à chaque build EAS : une seule
-      // ligne à remplacer.
-      document
-        .getElementById('apk')
-        .setAttribute(
-          'href',
-          'https://expo.dev/artifacts/eas/O1JQb-4toYKbNP9weV_N24TmPYNsXDLfHGb6RrQ5y2I.apk',
-        )
+      // constante à remplacer.
+      var APK = 'https://expo.dev/artifacts/eas/O1JQb-4toYKbNP9weV_N24TmPYNsXDLfHGb6RrQ5y2I.apk'
+      ;['apk', 'apk2'].forEach(function (id) {
+        var el = document.getElementById(id)
+        if (el) el.setAttribute('href', APK)
+      })
 
-      // Apparition au défilement, désactivée si l'utilisateur a demandé de
-      // réduire les animations.
       var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      var items = document.querySelectorAll('.reveal')
+      var items = document.querySelectorAll('.rv')
       if (reduced || !('IntersectionObserver' in window)) {
         items.forEach(function (el) {
-          el.classList.add('seen')
+          el.classList.add('in')
         })
       } else {
         var io = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (e) {
+          function (es) {
+            es.forEach(function (e) {
               if (e.isIntersecting) {
-                e.target.classList.add('seen')
+                e.target.classList.add('in')
                 io.unobserve(e.target)
               }
             })
           },
-          { rootMargin: '0px 0px -12% 0px' },
+          { rootMargin: '0px 0px -10% 0px' },
         )
         items.forEach(function (el) {
           io.observe(el)

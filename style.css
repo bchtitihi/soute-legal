@@ -2,17 +2,17 @@
    "nuit et hublot"). Sombre en permanence, comme la page d'accueil : une
    bascule de thème entre deux pages du meme site fait bricolé. */
 :root {
-  --background: #06100f;
-  --surface: rgba(255, 255, 255, 0.04);
-  --surface-raised: rgba(255, 255, 255, 0.07);
-  --border: rgba(255, 255, 255, 0.1);
-  --text-primary: #eaf4f2;
-  --text-secondary: #a9c0bd;
-  --text-muted: #74908d;
-  --accent: #46cdba;
-  --on-accent: #04201c;
-  --warning-muted: rgba(227, 168, 69, 0.17);
-  --on-warning-muted: #e3a845;
+  --background: #070c0c;
+  --surface: rgba(238, 243, 241, 0.04);
+  --surface-raised: rgba(238, 243, 241, 0.07);
+  --border: rgba(238, 243, 241, 0.11);
+  --text-primary: #eef3f1; /* 17,55:1 */
+  --text-secondary: #a8bab7; /* 9,72:1 */
+  --text-muted: #6e8482; /* 4,95:1 — plancher AA pour le texte courant */
+  --accent: #4ad4c0; /* 10,75:1 */
+  --on-accent: #042320;
+  --warning-muted: rgba(224, 169, 76, 0.16);
+  --on-warning-muted: #e0a94c;
 }
 
 * {
