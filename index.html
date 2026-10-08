@@ -23,32 +23,36 @@
       </header>
 
       <section class="card download">
-        <h2>Installer sur Android</h2>
-        <p class="muted">Version 0.1.0 · environ 60 Mo · Android 7 et plus</p>
-        <a class="button" id="apk" href="#">Télécharger l'application</a>
+        <h2>Installer depuis Google Play</h2>
+        <p class="muted">Version 0.1.0 · environ 24 Mo · Android 7 et plus</p>
+        <a
+          class="button"
+          href="https://play.google.com/apps/internaltest/4701191682274592788"
+          >Rejoindre le test et installer</a
+        >
         <p class="note">
-          Le téléchargement démarre immédiatement. Le fichier s'appelle
-          <code>application-&hellip;.apk</code>.
+          Réservé aux testeurs dont l'adresse a été ajoutée au programme. Si tu obtiens une erreur,
+          c'est que ton adresse n'y figure pas encore.
         </p>
       </section>
 
       <section class="card">
-        <h2>Si Android bloque l'installation</h2>
-        <p>C'est normal : l'application ne vient pas du Play Store. Trois écrans à passer.</p>
+        <h2>Comment ça se passe</h2>
         <ol class="steps">
           <li>
-            Après le téléchargement, appuie sur <strong>Ouvrir</strong> dans la notification.
+            Ouvre le lien ci-dessus <strong>sur ton téléphone Android</strong>, connecté avec le
+            compte Google actif sur cet appareil.
           </li>
+          <li>Appuie sur <strong>Devenir testeur</strong>. Cette étape est obligatoire.</li>
           <li>
-            Android affiche <em>« votre téléphone n'est pas autorisé à installer des applications
-            inconnues provenant de cette source »</em>. Appuie sur <strong>Paramètres</strong>,
-            active <strong>Autoriser depuis cette source</strong>, puis reviens en arrière.
-          </li>
-          <li>
-            Si Play Protect affiche <em>« application non vérifiée »</em>, choisis
-            <strong>Installer quand même</strong>.
+            Appuie ensuite sur le lien vers Google Play qui apparaît, puis installe comme une
+            application ordinaire.
           </li>
         </ol>
+        <p class="muted">
+          L'application s'appellera <code>fr.soute.app</code> et non « Soute » tant que Google n'a
+          pas examiné la fiche. C'est normal.
+        </p>
       </section>
 
       <section class="card warning">
@@ -70,6 +74,20 @@
         </p>
       </section>
 
+      <section class="card">
+        <h2>Si Google Play ne fonctionne pas</h2>
+        <p>
+          Le programme de test exige une adresse Gmail ou Google Workspace, inscrite au préalable.
+          À défaut, le fichier d'installation se télécharge directement :
+        </p>
+        <p><a id="apk" href="#">Télécharger le fichier d'installation</a></p>
+        <p class="muted">
+          Android affichera alors un avertissement parce que l'application ne vient pas du Play
+          Store : autorise l'installation depuis cette source, puis choisis « Installer quand
+          même » si Play Protect insiste.
+        </p>
+      </section>
+
       <footer>
         <nav>
           <a href="confidentialite.html">Confidentialité</a>
@@ -80,8 +98,8 @@
     </main>
 
     <script>
-      // L'URL de l'artefact est posée ici pour pouvoir la remplacer a chaque
-      // nouveau build sans toucher au reste de la page.
+      // Repli hors Google Play. L'URL change a chaque build EAS ; elle est
+      // isolee ici pour n'avoir qu'une ligne a remplacer.
       var APK_URL =
         'https://expo.dev/artifacts/eas/O1JQb-4toYKbNP9weV_N24TmPYNsXDLfHGb6RrQ5y2I.apk'
       document.getElementById('apk').setAttribute('href', APK_URL)
